@@ -2,32 +2,32 @@
 @icon("res://addons/adivery/icon.svg")
 class_name BannerAdvertisement
 extends Control
-## نودی که قابلیت نمایش تبلیغات بنری را درون بازی شما می دهد 
+## نودی که قابلیت نمایش تبلیغات بنری را درون بازی شما می دهد
 ##
-## نودی که قابلیت نمایش تبلیغات بنری را درون بازی شما می دهد 
+## نودی که قابلیت نمایش تبلیغات بنری را درون بازی شما می دهد
 ## [br]
-## جهت استفاده از تبلیغات بنری، [Adivery] باید تنظیم شده باشد. 
-## جهت استفاده از بنر کافی است آن را به سین مد نظر اضافه کرده و مقادیر مد نظر را تنظیم کنید. 
-## نود بنر واسط ارتباط با ویو بنر می باشد و یعنی با یک بار لود شدن آن در همه جا قابل دسترس می باشد بنابراین بهترین جا برای فراخوانی آن Autoload می باشد. 
-## توجه داشته باشید با اسکرول شدن، تغییر اندازه و چرخش نود تاثیری در نمایش بنر ندارد. 
+## جهت استفاده از تبلیغات بنری، [Adivery] باید تنظیم شده باشد.
+## جهت استفاده از بنر کافی است آن را به سین مد نظر اضافه کرده و مقادیر مد نظر را تنظیم کنید.
+## نود بنر واسط ارتباط با ویو بنر می باشد و یعنی با یک بار لود شدن آن در همه جا قابل دسترس می باشد بنابراین بهترین جا برای فراخوانی آن Autoload می باشد.
+## توجه داشته باشید با اسکرول شدن، تغییر اندازه و چرخش نود تاثیری در نمایش بنر ندارد.
 ## [br]
 ## [b]هشدار:[/b] به هیچ عنوان از یک شناسه تبلیغ گاه برای چندین بنر استفاده نکنید.
 
 
-## زمانی منتشر میشود که تبلیغ بنری آشکار یا پنهان شود. 
+## زمانی منتشر میشود که تبلیغ بنری آشکار یا پنهان شود.
 signal shown(visibility: bool)
-## زمانی منتشر میشود که تبلیغ نمایش داده شود. 
+## زمانی منتشر میشود که تبلیغ نمایش داده شود.
 signal loaded
-## زمانی منتشر میشود که تبلیغ با خظایی روبه رو شود. 
+## زمانی منتشر میشود که تبلیغ با خظایی روبه رو شود.
 signal error(reason: String)
-## زمانی منتشر میشود که برروی تبلیغ کلیک شود. 
+## زمانی منتشر میشود که برروی تبلیغ کلیک شود.
 signal clicked
-## زمانی منتشر میشود که تبلیغ بسته شود. 
+## زمانی منتشر میشود که تبلیغ بسته شود.
 signal closed
 
 const DEFAULT_PLACEMENT_ID: String = "66e01251-50ac-4068-a05e-2c675e367611"
 
-## انداره تبلیغات بنری 
+## انداره تبلیغات بنری
 enum BannerSize {
 	## 320 x 50
 	BANNER = 1,
@@ -37,22 +37,22 @@ enum BannerSize {
 	MEDIUM_RECTANGLE = 3,
 	SMART_BANNER = 4,
 }
-## پنهان و یا آشکار سازی تبلیغ 
+## پنهان و یا آشکار سازی تبلیغ
 @export var visibility: bool = true:
 	set(value):
 		visibility = value
 		_set_visibility.call_deferred()
 		notify_property_list_changed()
-## آماده سازی خودکار تبلیغ 
+## آماده سازی خودکار تبلیغ
 @export var prepare: bool = false
-## تلاش مجدد هنگام خطا 
+## تلاش مجدد هنگام خطا
 @export var retry_on_error: bool = false
-## انداره تبلیغات بنری 
+## انداره تبلیغات بنری
 @export var banner_size: BannerSize = BannerSize.BANNER:
 	set(new_size):
 		banner_size = new_size
 		_set_banner_size.call_deferred()
-## شناسه تبلیغ گاه 
+## شناسه تبلیغ گاه
 @export_placeholder(DEFAULT_PLACEMENT_ID) var placement_id: String
 
 func _validate_property(property: Dictionary) -> void:
@@ -91,7 +91,7 @@ func _ready() -> void:
 	set_banner_size()
 	load_banner_ad()
 
-## آماده سازی تبلیغ بنری 
+## آماده سازی تبلیغ بنری
 func prepare_banner_ad(placement_id: String = "", retry_on_error: bool = false) -> void:
 	if not Engine.has_singleton(Adivery._singleton_name): return
 	if not placement_id.is_empty():
@@ -102,27 +102,27 @@ func prepare_banner_ad(placement_id: String = "", retry_on_error: bool = false) 
 		self.retry_on_error = retry_on_error
 	Adivery._singleton.prepare_banner_ad(self.placement_id, self.retry_on_error)
 	if not Adivery._singleton.is_connected("_on_banner_ad_loaded", __on_banner_ad_loaded):
-		Adivery._singleton._on_banner_ad_loaded.connect(__on_banner_ad_loaded)
+		Adivery._singleton.banner_ad_loaded.connect(__on_banner_ad_loaded)
 	if not Adivery._singleton.is_connected("_on_banner_ad_error", __on_banner_ad_error):
-		Adivery._singleton._on_banner_ad_error.connect(__on_banner_ad_error)
+		Adivery._singleton.banner_ad_error.connect(__on_banner_ad_error)
 	if not Adivery._singleton.is_connected("_on_banner_ad_clicked", __on_banner_ad_clicked):
-		Adivery._singleton._on_banner_ad_clicked.connect(__on_banner_ad_clicked)
+		Adivery._singleton.banner_ad_clicked.connect(__on_banner_ad_clicked)
 	_set_banner_position()
 
-## تنظیم اندازه تبلیغ بنری 
+## تنظیم اندازه تبلیغ بنری
 func set_banner_size(banner_size: BannerSize = 0) -> void:
 	if not Engine.has_singleton(Adivery._singleton_name): return
 	if banner_size != 0:
 		self.banner_size = banner_size
 	Adivery._singleton.set_banner_size(placement_id, self.banner_size)
 
-## نمایش تبلیغ بنری 
+## نمایش تبلیغ بنری
 func load_banner_ad() -> void:
 	if not Engine.has_singleton(Adivery._singleton_name): return
 	Adivery._singleton.load_banner_ad(placement_id)
 	_set_visibility()
 
-## بستن تبلیغ بنری 
+## بستن تبلیغ بنری
 func close_banner() -> void:
 	if not Engine.has_singleton(Adivery._singleton_name): return
 	Adivery._singleton.close_banner(placement_id)

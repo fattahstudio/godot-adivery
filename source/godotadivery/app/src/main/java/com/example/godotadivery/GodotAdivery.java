@@ -36,6 +36,9 @@ import java.util.concurrent.TimeUnit;
 public class GodotAdivery extends GodotPlugin {
     private Dictionary<String,AdiveryBannerAdView> bannerAd = new Hashtable<>();
     private Dictionary<String,AdiveryNativeAd> nativeAd = new Hashtable<>();
+    public String i_placement_id = "";
+    public boolean show_on_resume = false;
+    private long lastPauseTime = 0L;
     public GodotAdivery(Godot godot) {
         super(godot);
     }
@@ -47,97 +50,102 @@ public class GodotAdivery extends GodotPlugin {
     @Override
     public Set<SignalInfo> getPluginSignals() {
         Set<SignalInfo> signals = new HashSet<>();
-        signals.add(new SignalInfo("_on_log", String.class, String.class));
-        signals.add(new SignalInfo("_on_interstitial_ad_loaded", String.class));
-        signals.add(new SignalInfo("_on_interstitial_ad_shown", String.class));
-        signals.add(new SignalInfo("_on_interstitial_ad_clicked", String.class));
-        signals.add(new SignalInfo("_on_interstitial_ad_closed", String.class));
-        signals.add(new SignalInfo("_on_rewarded_ad_loaded", String.class));
-        signals.add(new SignalInfo("_on_rewarded_ad_shown", String.class));
-        signals.add(new SignalInfo("_on_rewarded_ad_clicked", String.class));
-        signals.add(new SignalInfo("_on_rewarded_ad_closed", String.class, Boolean.class));
-        signals.add(new SignalInfo("_on_app_open_ad_loaded", String.class));
-        signals.add(new SignalInfo("_on_app_open_ad_closed", String.class));
-        signals.add(new SignalInfo("_on_app_open_ad_clicked", String.class));
-        signals.add(new SignalInfo("_on_app_open_ad_shown", String.class));
-        signals.add(new SignalInfo("_on_banner_ad_clicked", String.class));
-        signals.add(new SignalInfo("_on_banner_ad_error", String.class, String.class));
-        signals.add(new SignalInfo("_on_banner_ad_loaded", String.class));
-        signals.add(new SignalInfo("_on_native_ad_loaded", String.class, org.godotengine.godot.Dictionary.class));
-        signals.add(new SignalInfo("_on_native_ad_shown", String.class));
-        signals.add(new SignalInfo("_on_native_ad_shown_failed", String.class));
-        signals.add(new SignalInfo("_on_native_ad_clicked", String.class));
-        signals.add(new SignalInfo("_on_native_ad_load_failed", String.class));
+        // interstitial ad
+        signals.add(new SignalInfo("interstitial_ad_loaded", String.class));
+        signals.add(new SignalInfo("interstitial_ad_shown", String.class));
+        signals.add(new SignalInfo("interstitial_ad_clicked", String.class));
+        signals.add(new SignalInfo("interstitial_ad_closed", String.class));
+        // rewarded ad
+        signals.add(new SignalInfo("rewarded_ad_loaded", String.class));
+        signals.add(new SignalInfo("rewarded_ad_shown", String.class));
+        signals.add(new SignalInfo("rewarded_ad_clicked", String.class));
+        signals.add(new SignalInfo("rewarded_ad_closed", String.class, Boolean.class));
+        // app open ad
+        signals.add(new SignalInfo("app_open_ad_loaded", String.class));
+        signals.add(new SignalInfo("app_open_ad_closed", String.class));
+        signals.add(new SignalInfo("app_open_ad_clicked", String.class));
+        signals.add(new SignalInfo("app_open_ad_shown", String.class));
+        // banner ad
+        signals.add(new SignalInfo("banner_ad_clicked", String.class));
+        signals.add(new SignalInfo("banner_ad_error", String.class, String.class));
+        signals.add(new SignalInfo("banner_ad_loaded", String.class));
+        // native ad
+        signals.add(new SignalInfo("native_ad_loaded", String.class, org.godotengine.godot.Dictionary.class));
+        signals.add(new SignalInfo("native_ad_shown", String.class));
+        signals.add(new SignalInfo("native_ad_shown_failed", String.class));
+        signals.add(new SignalInfo("native_ad_clicked", String.class));
+        signals.add(new SignalInfo("native_ad_load_failed", String.class));
         return signals;
     }
 
+    // Godot methods
     @UsedByGodot
     public void configure(String app_id) {
         Adivery.configure(getGodot().getActivity().getApplication(),app_id);
     }
-    @UsedByGodot
-    public void show_log() {
-        Adivery.addGlobalListener(new AdiveryListener() {
-            public void log(String placementId, String message) {
-                emitSignal("_on_log",placementId,message);
-            }
-        });
-    }
+
+    // interstitial ad
     @UsedByGodot
     public void prepare_interstitial_ad(String placement_id) {
         Adivery.prepareInterstitialAd(getActivity(),placement_id);
         Adivery.addGlobalListener(new AdiveryListener() {
             @Override
             public void onInterstitialAdLoaded(String placementId) {
-                emitSignal("_on_interstitial_ad_loaded",placementId);
+                emitSignal("interstitial_ad_loaded",placementId);
             }
             public void onInterstitialAdShown(String placementId) {
-                emitSignal("_on_interstitial_ad_shown",placementId);
+                emitSignal("interstitial_ad_shown",placementId);
             }
             public void onInterstitialAdClicked(String placementId) {
-                emitSignal("_on_interstitial_ad_clicked",placementId);
+                emitSignal("interstitial_ad_clicked",placementId);
             }
             public void onInterstitialAdClosed(String placementId) {
-                emitSignal("_on_interstitial_ad_closed",placementId);
+                emitSignal("interstitial_ad_closed",placementId);
             }
         });
     }
+
+    // rewarded ad
     @UsedByGodot
     public void request_rewarded_ad(String placement_id) {
         Adivery.prepareRewardedAd(getActivity(),placement_id);
         Adivery.addGlobalListener(new AdiveryListener() {
             public void onRewardedAdLoaded(String placementId) {
-                emitSignal("_on_rewarded_ad_loaded",placementId);
+                emitSignal("rewarded_ad_loaded",placementId);
             }
             public void onRewardedAdShown(String placementId) {
-                emitSignal("_on_rewarded_ad_shown",placementId);
+                emitSignal("rewarded_ad_shown",placementId);
             }
             public void onRewardedAdClicked(String placementId) {
-                emitSignal("_on_rewarded_ad_clicked",placementId);
+                emitSignal("rewarded_ad_clicked",placementId);
             }
             public void onRewardedAdClosed(String placementId, boolean isRewarded) {
-                emitSignal("_on_rewarded_ad_closed",placementId,isRewarded);
+                emitSignal("rewarded_ad_closed",placementId,isRewarded);
             }
         });
     }
+
+    // app open ad
     @UsedByGodot
     public void prepare_app_open_ad(String placement_id) {
         Adivery.prepareAppOpenAd(getActivity(),placement_id);
         Adivery.addGlobalListener(new AdiveryListener() {
             public void onAppOpenAdLoaded(String placementId) {
-                emitSignal("_on_app_open_ad_loaded",placementId);
+                emitSignal("app_open_ad_loaded",placementId);
             }
             public void onAppOpenAdClosed(String placementId) {
-                emitSignal("_on_app_open_ad_closed",placementId);
+                emitSignal("app_open_ad_closed",placementId);
             }
             public void onAppOpenAdClicked(String placementId) {
-                emitSignal("_on_app_open_ad_clicked",placementId);
+                emitSignal("app_open_ad_clicked",placementId);
             }
             public void onAppOpenAdShown(String placementId) {
-                emitSignal("_on_app_open_ad_shown",placementId);
+                emitSignal("app_open_ad_shown",placementId);
             }
         });
     }
+
+    // banner ad
     @UsedByGodot
     public void prepare_banner_ad(String placement_id, boolean retry_on_error) {
         AdiveryBannerAdView bannerAdView = new AdiveryBannerAdView(getActivity());
@@ -147,15 +155,15 @@ public class GodotAdivery extends GodotPlugin {
         bannerAdView.setBannerAdListener(new AdiveryAdListener() {
             @Override
             public void onAdLoaded() {
-                emitSignal("_on_banner_ad_loaded", placement_id);
+                emitSignal("banner_ad_loaded", placement_id);
             }
             @Override
             public void onError(String reason) {
-                emitSignal("_on_banner_ad_error", placement_id, reason);
+                emitSignal("banner_ad_error", placement_id, reason);
             }
             @Override
             public void onAdClicked() {
-                emitSignal("_on_banner_ad_clicked", placement_id);
+                emitSignal("banner_ad_clicked", placement_id);
             }
         });
     }
@@ -211,7 +219,7 @@ public class GodotAdivery extends GodotPlugin {
         bannerAdView.loadAd();
     }
     @UsedByGodot
-    public void set_visibility(String placement_id, boolean visibility) {
+    public void set_banner_visibility(String placement_id, boolean visibility) {
         getGodot().runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -236,6 +244,8 @@ public class GodotAdivery extends GodotPlugin {
             }
         });
     }
+
+    //
     @UsedByGodot
     public void show_ad(String placement_id) {
         if (Adivery.isLoaded(placement_id)) {
@@ -259,17 +269,19 @@ public class GodotAdivery extends GodotPlugin {
         result = Adivery.isLoaded(placement_id);
         return result;
     }
+
+    // native ad
     @UsedByGodot
     public void request_native_ad(String placement_id) {
         Adivery.requestNativeAd(getActivity(), placement_id, new AdiveryNativeCallback() {
             @Override
             public void onAdLoadFailed(@NotNull String reason) {
-                emitSignal("_on_native_ad_load_failed", placement_id);
+                emitSignal("native_ad_load_failed", placement_id);
             }
 
             @Override
             public void onAdClicked() {
-                emitSignal("_on_native_ad_clicked", placement_id);
+                emitSignal("native_ad_clicked", placement_id);
             }
 
             @Override
@@ -290,15 +302,15 @@ public class GodotAdivery extends GodotPlugin {
                 result.put("image", encodeToBase64(imageB));
                 result.put("image_url", adiveryNativeAd.getImageUrl());
                 result.put("call_to_action", adiveryNativeAd.getCallToAction());
-                emitSignal("_on_native_ad_loaded", placement_id, result);
+                emitSignal("native_ad_loaded", placement_id, result);
             }
             @Override
             public void onAdShowFailed(@NotNull String reason) {
-                emitSignal("_on_native_ad_shown_failed", placement_id);
+                emitSignal("native_ad_shown_failed", placement_id);
             }
             @Override
             public void onAdShown() {
-                emitSignal("_on_native_ad_shown", placement_id);
+                emitSignal("native_ad_shown", placement_id);
             }
         });
     }
@@ -313,6 +325,7 @@ public class GodotAdivery extends GodotPlugin {
         adiveryNativeAd.recordImpression();
     }
 
+    //
     @UsedByGodot
     public void set_user_id(String user_id) {
         Adivery.setUserId(user_id);
@@ -342,9 +355,7 @@ public class GodotAdivery extends GodotPlugin {
         drawable.draw(canvas);
         return bitmap;
     }
-    public String i_placement_id = "";
-    public boolean show_on_resume = false;
-    private long lastPauseTime = 0L;
+
     @UsedByGodot
     public void set_show_on_resume(boolean value) {
         show_on_resume = value;

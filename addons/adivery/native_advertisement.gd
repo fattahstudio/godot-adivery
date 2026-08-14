@@ -6,38 +6,38 @@ extends Control
 ##
 ## نودی که قابلیت نمایش تبلیغات همسان را درون بازی شما می دهد
 ## [br]
-## جهت استفاده از تبلیغات همسان، [Adivery] باید تنظیم شده باشد. 
-## جهت استفاده از تبلیغات همسان کافی است آن را به سین مد نظر اضافه کرده و مقادیر مد نظر را تنظیم کنید. 
+## جهت استفاده از تبلیغات همسان، [Adivery] باید تنظیم شده باشد.
+## جهت استفاده از تبلیغات همسان کافی است آن را به سین مد نظر اضافه کرده و مقادیر مد نظر را تنظیم کنید.
 ## [br]
 ## [b]هشدار:[/b] به هیچ عنوان از یک شناسه تبلیغ گاه برای چندین بنر استفاده نکنید.
 
-## زمانی منتشر می شود که تبلیغ بارگیری شود. 
+## زمانی منتشر می شود که تبلیغ بارگیری شود.
 signal loaded
-## زمانی منتشر می شود که تبلیغ نمایش داده شود. 
+## زمانی منتشر می شود که تبلیغ نمایش داده شود.
 signal shown
-## زمانی منتشر می شود که مشکلی در نمایش تبلیغ وجود داشته باشد. 
+## زمانی منتشر می شود که مشکلی در نمایش تبلیغ وجود داشته باشد.
 signal shown_failed
-## زمانی منتشر می شود که برروی دکمه تبلیغ کلیک شود. 
+## زمانی منتشر می شود که برروی دکمه تبلیغ کلیک شود.
 signal clicked
-## زمانی منتشر می شود که مشکلی در بارگیری تبلیغ وجود داشته باشد. 
+## زمانی منتشر می شود که مشکلی در بارگیری تبلیغ وجود داشته باشد.
 signal load_failed
 
 const DEFAULT_PLACEMENT_ID: String = "4c76642f-b2c6-4b42-9a28-c54d09c6ec02"
 
-## درخواست خودکار تبلیغ 
+## درخواست خودکار تبلیغ
 @export var request: bool = false
-## شناسه تبلیغ گاه 
+## شناسه تبلیغ گاه
 @export_placeholder(DEFAULT_PLACEMENT_ID) var placement_id: String
 @export_group("Details")
-## داشتن عنوان تبلیغ 
+## داشتن عنوان تبلیغ
 ## [br]
 ## [b]هشدار:[/b] به هیچ عنوان تغییری در این مقدار ندهید و از حذف نود عنوان خودداری کنید.
 @export var has_head_line: bool = false
-## داشتن دکمه عملیات 
+## داشتن دکمه عملیات
 ## [br]
 ## [b]هشدار:[/b] به هیچ عنوان تغییری در این مقدار ندهید و از حذف نود عنوان خودداری کنید.
 @export var has_call_to_action: bool = false
-## داشتن نام برند و یا اپلیکیشن 
+## داشتن نام برند و یا اپلیکیشن
 @export var has_advertiser: bool = false:
 	set(value):
 		has_advertiser = value
@@ -46,7 +46,7 @@ const DEFAULT_PLACEMENT_ID: String = "4c76642f-b2c6-4b42-9a28-c54d09c6ec02"
 		else :
 			_advertiser.queue_free()
 			_advertiser = null
-## داشتن توضیحات 
+## داشتن توضیحات
 @export var has_description: bool = false:
 	set(value):
 		has_description = value
@@ -55,7 +55,7 @@ const DEFAULT_PLACEMENT_ID: String = "4c76642f-b2c6-4b42-9a28-c54d09c6ec02"
 		else :
 			_description.queue_free()
 			_description = null
-## داشتن آیکون که نسبت آن 1:1 است 
+## داشتن آیکون که نسبت آن 1:1 است
 @export var has_icon: bool = false:
 	set(value):
 		has_icon = value
@@ -64,7 +64,7 @@ const DEFAULT_PLACEMENT_ID: String = "4c76642f-b2c6-4b42-9a28-c54d09c6ec02"
 		else :
 			_icon.queue_free()
 			_icon = null
-## داشتن تصویر که نسبت آن 16:9 است 
+## داشتن تصویر که نسبت آن 16:9 است
 @export var has_image: bool = false:
 	set(value):
 		has_image = value
@@ -94,9 +94,9 @@ func _ready() -> void:
 	#await Signal(Adivery._self, "configured")
 	request_native_ad()
 
-## درخواست تبلیغات همسان 
+## درخواست تبلیغات همسان
 ## [br]
-## درصورت تست تبلیغات مقدار پیشفرض را تغییر ندهید و یا مقداری وارد نکنید. 
+## درصورت تست تبلیغات مقدار پیشفرض را تغییر ندهید و یا مقداری وارد نکنید.
 func request_native_ad(placement_id: String = "") -> void:
 	if not Engine.has_singleton(Adivery._singleton_name): return
 	if not placement_id.is_empty():
@@ -105,15 +105,15 @@ func request_native_ad(placement_id: String = "") -> void:
 		self.placement_id = DEFAULT_PLACEMENT_ID
 	Adivery._singleton.request_native_ad(self.placement_id)
 	if not Adivery._singleton.is_connected("_on_native_ad_loaded", __on_native_ad_loaded):
-		Adivery._singleton._on_native_ad_loaded.connect(__on_native_ad_loaded)
+		Adivery._singleton.native_ad_loaded.connect(__on_native_ad_loaded)
 	if not Adivery._singleton.is_connected("_on_native_ad_shown", __on_native_ad_shown):
-		Adivery._singleton._on_native_ad_shown.connect(__on_native_ad_shown)
+		Adivery._singleton.native_ad_shown.connect(__on_native_ad_shown)
 	if not Adivery._singleton.is_connected("_on_native_ad_shown_failed", __on_native_ad_shown_failed):
-		Adivery._singleton._on_native_ad_shown_failed.connect(__on_native_ad_shown_failed)
+		Adivery._singleton.native_ad_shown_failed.connect(__on_native_ad_shown_failed)
 	if not Adivery._singleton.is_connected("_on_native_ad_clicked", __on_native_ad_clicked):
-		Adivery._singleton._on_native_ad_clicked.connect(__on_native_ad_clicked)
+		Adivery._singleton.native_ad_clicked.connect(__on_native_ad_clicked)
 	if not Adivery._singleton.is_connected("_on_native_ad_load_failed", __on_native_ad_load_failed):
-		Adivery._singleton._on_native_ad_load_failed.connect(__on_native_ad_load_failed)
+		Adivery._singleton.native_ad_load_failed.connect(__on_native_ad_load_failed)
 	if not _call_to_action: return
 	if not _call_to_action.is_connected("pressed", _action):
 		_call_to_action.pressed.connect(_action)
@@ -191,17 +191,17 @@ func __on_native_ad_loaded(placement_id: String, result: Dictionary) -> void:
 	if placement_id != self.placement_id: return
 	_data = NativeData.new(result)
 	if _head_line:
-		_head_line.text = _data.head_line 
+		_head_line.text = _data.head_line
 	if _advertiser:
-		_advertiser.text = _data.advertiser 
+		_advertiser.text = _data.advertiser
 	if _description:
-		_description.text = _data.description 
+		_description.text = _data.description
 	if _icon:
-		_icon.texture = NativeData.image_to_texture(_data.icon) 
+		_icon.texture = NativeData.image_to_texture(_data.icon)
 	if _image:
-		_image.texture = NativeData.image_to_texture(_data.image) 
+		_image.texture = NativeData.image_to_texture(_data.image)
 	if _call_to_action:
-		_call_to_action.text = _data.call_to_action 
+		_call_to_action.text = _data.call_to_action
 	loaded.emit()
 
 func __on_native_ad_shown(placement_id: String) -> void:

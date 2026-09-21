@@ -269,7 +269,7 @@ func _get_advertisement(placement_id: String) -> Advertisement:
 	var advertisement: Advertisement
 	for ad: Advertisement in advertisements:
 		if ad.placement_id == placement_id:
-			ad = advertisement
+			advertisement = ad
 			break
 	return advertisement
 

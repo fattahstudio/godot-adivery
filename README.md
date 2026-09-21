@@ -27,7 +27,9 @@
 - [پیاده سازی تبلیغات همسان](#پیاده-سازی-تبلیغات-همسان)
 
 ## پیش نیازها
-- گودو 4.2 و یا بالاتر
+- گودو 4.7.2
+- اندروید 16 (API 36) برای خروجی هدف
+- بیلد با Gradle 8.11.1، Android Gradle Plugin 8.6.1 و Java 17
 - [خروجی اندروید](https://docs.godotengine.org/en/stable/tutorials/export/exporting_for_android.html)
 - [خروجی اندروید با گریدل](https://docs.godotengine.org/en/stable/tutorials/export/android_gradle_build.html)
  

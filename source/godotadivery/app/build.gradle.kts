@@ -11,7 +11,8 @@ base {
 
 android {
     namespace = pluginPackageName
-    compileSdk = 34
+    compileSdk = 36
+    buildToolsVersion = "36.1.0"
 
     buildFeatures {
         buildConfig = true
@@ -33,7 +34,7 @@ android {
 
 dependencies {
     //noinspection Aligned16KB
-    implementation("org.godotengine:godot:4.2.0.stable")
+    implementation("org.godotengine:godot:4.7.2.stable")
     implementation("com.adivery:sdk:4.9.0")
     implementation("org.jetbrains.kotlin:kotlin-stdlib:2.1.21")
 

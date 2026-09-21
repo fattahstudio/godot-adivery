@@ -200,7 +200,7 @@ public class GodotAdivery extends GodotPlugin {
         }
         int finalWidth = width;
         int finalHeight = height;
-        getGodot().runOnUiThread(new Runnable() {
+        getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 getActivity().addContentView(bannerAdView,new ViewGroup.LayoutParams(finalWidth, finalHeight));
@@ -220,7 +220,7 @@ public class GodotAdivery extends GodotPlugin {
     }
     @UsedByGodot
     public void set_banner_visibility(String placement_id, boolean visibility) {
-        getGodot().runOnUiThread(new Runnable() {
+        getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 AdiveryBannerAdView bannerAdView = bannerAd.get(placement_id);
@@ -235,7 +235,7 @@ public class GodotAdivery extends GodotPlugin {
     }
     @UsedByGodot
     public void close_banner(String placement_id) {
-        getGodot().runOnUiThread(new Runnable() {
+        getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 AdiveryBannerAdView bannerAdView = bannerAd.get(placement_id);
@@ -255,7 +255,7 @@ public class GodotAdivery extends GodotPlugin {
     @UsedByGodot
     public void show_app_open_ad(String placement_id) {
         if (Adivery.isLoaded(placement_id)) {
-            getGodot().runOnUiThread(new Runnable() {
+            getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                     Adivery.showAppOpenAd(getGodot().getActivity(), placement_id);

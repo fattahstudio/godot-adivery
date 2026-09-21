@@ -33,7 +33,7 @@ class AndroidExportPlugin extends EditorExportPlugin:
 			return PackedStringArray(["adivery/bin/GodotAdivery-release.aar"])
 
 	func _get_android_dependencies(platform: EditorExportPlatform, debug: bool) -> PackedStringArray:
-		return PackedStringArray(["com.adivery:sdk:4.6.0"])
+		return PackedStringArray(["com.adivery:sdk:4.9.0"])
 	
 	
 	# Return the plugin's name.
